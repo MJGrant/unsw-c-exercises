@@ -1,18 +1,19 @@
 //lecture 7 homework
 
-//to compile:
-//gcc -g whatDay.c -o whatDay
-//to run:
-//./whatDay
+/* 
+to compile: gcc -g whatDay.c -o whatDay
+
+to run: ./whatDay
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
 
-//ask user for the day, month, and year they want to check
-//example: 12/31/2015
-
 int thisYearsDoomsday(int year);
 int thisCenturysAnchorDay(int year);
+
+//ask user for the day, month, and year they want to check
+//example: 12/31/2015
 
 int main (void) {
     
@@ -23,22 +24,43 @@ int main (void) {
     int doomsday;
     
     printf("This program will tell you what day of the week a certain date lands on.\n");
+    
+    //DAY
     printf("Enter DAY (1-31):\n");
     scanf("%d", &day);
+    
+    if (day < 1 || day > 31) {
+        printf("%d is not a valid day (1...31)\n", day);
+        return EXIT_FAILURE;
+    }
+    
+    //MONTH
     printf("Enter MONTH (1-12):\n");
     scanf("%d", &month);
-    printf("Enter YEAR (1800-2100):\n");
+
+    if (month < 1 || month > 12) {
+        printf("%d is not a valid month (1...12)\n", month);
+        return EXIT_FAILURE;
+    }
+    
+    //YEAR
+    printf("Enter YEAR (1800-2199):\n");
     scanf("%d", &year);
     
-    doomsday = thisYearsDoomsday(year);
-    printf("This year's doomsday: %d\n", doomsday);
+    if (year >= 1800 && year <=2199) {
+        doomsday = thisYearsDoomsday(year);
+        printf("This year's doomsday: %d\n", doomsday);
+    } else {
+        printf("%d is not a valid year (1800...2199)\n", year);
+        return EXIT_FAILURE;
+    }
+    
     
     printf("You entered: %d/%d/%d\n", day, month, year);
     return EXIT_SUCCESS;
 }
 
-//process year to determine if it's a 365 day year or a 366 day year
-//365 day year
+//Anchor days
 
 //1800-1899 Friday (5)
 //1900-1999 Wednesday (3)
@@ -65,7 +87,7 @@ int thisCenturysAnchorDay(int year) {
 }
 
 //determine the "doomsday" (as a day number) for that specific year (we have to know what it is for a particular year first, then calculate from that)
-//it's Saturday in the 12/32/2015 test case
+//it's Saturday (6) in the 12/32/2015 test case
 
 int thisYearsDoomsday(int year) {
     //get the anchor
@@ -100,7 +122,7 @@ int thisYearsDoomsday(int year) {
     int doomsday;
     doomsday = (anchor + t) % 7;
 
-    //returns doomsday as a number (0 = Sunday, 1 = Monday, etc)
+    //returns this year's doomsday as a number (0 = Sunday, 1 = Monday, etc)
     return doomsday;
     
 }
