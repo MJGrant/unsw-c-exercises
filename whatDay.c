@@ -11,6 +11,7 @@ to run: ./whatDay
 
 int thisYearsDoomsday(int year);
 int thisCenturysAnchorDay(int year);
+char * dayOfWeekString(int day);
 
 //ask user for the day, month, and year they want to check
 //example: 12/31/2015
@@ -49,7 +50,7 @@ int main (void) {
     
     if (year >= 1800 && year <=2199) {
         doomsday = thisYearsDoomsday(year);
-        printf("This year's doomsday: %d\n", doomsday);
+        printf("This year's doomsday: %s\n", dayOfWeekString(doomsday));
     } else {
         printf("%d is not a valid year (1800...2199)\n", year);
         return EXIT_FAILURE;
@@ -127,7 +128,27 @@ int thisYearsDoomsday(int year) {
     
 }
 
-
+char * dayOfWeekString(int day) {
+    char *dayStr = "Noneday";
+    
+    if (day == 0) {
+        dayStr = "Sunday";
+    } else if (day == 1) {
+        dayStr = "Monday";
+    } else if (day == 2) {
+        dayStr = "Tuesday";
+    } else if (day == 3) {
+        dayStr = "Wednesday";
+    } else if (day == 4) {
+        dayStr = "Thursday";
+    } else if (day == 5) {
+        dayStr = "Friday";
+    } else if (day == 6) {
+        dayStr = "Saturday";
+    }
+    
+    return dayStr;
+}
 
 //determine nearest doomsday day/month combo
 //we have 12/31 as our date and we compare month and day (with tbd algoritm) to find 12/12
