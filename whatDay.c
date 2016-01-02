@@ -12,6 +12,8 @@ to run: ./whatDay
 int thisYearsDoomsday(int year);
 int thisCenturysAnchorDay(int year);
 char * dayOfWeekString(int day);
+char * monthNameString(int month);
+int distanceFromNearestDoomsday(int day, int month);
 
 //ask user for the day, month, and year they want to check
 //example: 12/31/2015
@@ -43,6 +45,7 @@ int main (void) {
         printf("%d is not a valid month (1...12)\n", month);
         return EXIT_FAILURE;
     }
+
     
     //YEAR
     printf("Enter YEAR (1800-2199):\n");
@@ -56,8 +59,11 @@ int main (void) {
         return EXIT_FAILURE;
     }
     
+
+    //put it all together
+    char *dayName = dayOfWeekString(distanceFromNearestDoomsday(day, month));
     
-    printf("You entered: %d/%d/%d\n", day, month, year);
+    printf("%s %d, %d is a %s\n", monthNameString(month), day, year, dayName);
     return EXIT_SUCCESS;
 }
 
@@ -152,12 +158,67 @@ char * dayOfWeekString(int day) {
     return dayStr;
 }
 
-//determine nearest doomsday day/month combo
-//we have 12/31 as our date and we compare month and day (with tbd algoritm) to find 12/12
+char * monthNameString(int month) {
+    char *months[] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+    
+    if (month >= 1 && month <= 12) {
+       return months[month - 1];
+    } else {
+        printf("Error: bad month %d passed in\n", month);
+    }
+    
+}
 
-//count days since that doomsday (we may be counting across months of varying lengths)
-//12/31 is 19 days from a doomsday (12/12)
-
-//divide 'days from doomsday' + 1 by 7 (20 % 7 = 5) gives us Friday (day 5)
-
-//return date and day of week ("December 31st 2015 is a Thursday")
+int distanceFromNearestDoomsday (int day, int month) {
+    /* 
+     1/3 or 1/4 depending on if it's a leap year
+     3/0 (or 2/29)
+     3/7
+     4/4
+     5/9
+     6/6
+     7/11
+     8/8
+     9/5
+     10/10
+     11/17
+     12/12
+     */
+    
+    int distance;
+    
+    if (month == 1) {
+        //absolute value of day - 3 or 4 leap year variation
+        distance = day - 3;
+    } else if (month == 2) {
+        distance = day - 29;
+    } else if (month == 3) {
+        distance = day - 7;
+    } else if (month == 4) {
+        distance = day - 4;
+    } else if (month == 5) {
+        distance = day - 9;
+    } else if (month == 6) {
+        distance = day - 6;
+    } else if (month == 7) {
+        distance = day - 11;
+    } else if (month == 8) {
+        distance = day - 8;
+    } else if (month == 9) {
+        distance = day - 5;
+    } else if (month == 10) {
+        distance = day - 10;
+    } else if (month == 11) {
+        distance = day - 17;
+    } else if (month == 12) {
+        distance = day - 12;
+    }
+    
+    //now we know how many days a day is from the month's doomsday...
+    printf("This day is %d days from this month's doomsday\n", distance);
+    
+    //take out all the multiples of 7 to get day of week number
+    int dayOfWeekNum = distance % 7;
+    
+    return dayOfWeekNum;
+}
