@@ -129,7 +129,7 @@ int thisYearsDoomsday(int year) {
 }
 
 char * dayOfWeekString(int day) {
-    char *dayStr = "Noneday";
+    char *dayStr = "";
     
     if (day == 0) {
         dayStr = "Sunday";
@@ -145,6 +145,8 @@ char * dayOfWeekString(int day) {
         dayStr = "Friday";
     } else if (day == 6) {
         dayStr = "Saturday";
+    } else {
+        dayStr = "ERROR";
     }
     
     return dayStr;
