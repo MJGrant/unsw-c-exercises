@@ -24,7 +24,7 @@ int main (void) {
     int month;
     int year;
     
-    int doomsday;
+    int doomsday; //0 ... 6 (Sunday, Monday, etc)
     
     printf("This program will tell you what day of the week a certain date lands on.\n");
     
@@ -53,7 +53,7 @@ int main (void) {
     
     if (year >= 1800 && year <=2199) {
         doomsday = thisYearsDoomsday(year);
-        printf("This year's doomsday: %s\n", dayOfWeekString(doomsday));
+        printf("%d's doomsday: %s\n", year, dayOfWeekString(doomsday));
     } else {
         printf("%d is not a valid year (1800...2199)\n", year);
         return EXIT_FAILURE;
@@ -61,7 +61,8 @@ int main (void) {
     
 
     //put it all together
-    char *dayName = dayOfWeekString(distanceFromNearestDoomsday(day, month));
+    int inputDateAsDayNum = doomsday + distanceFromNearestDoomsday(day, month);
+    char *dayName = dayOfWeekString(inputDateAsDayNum);
     
     printf("%s %d, %d is a %s\n", monthNameString(month), day, year, dayName);
     return EXIT_SUCCESS;
@@ -97,17 +98,15 @@ int thisCenturysAnchorDay(int year) {
 //it's Saturday (6) in the 12/32/2015 test case
 
 int thisYearsDoomsday(int year) {
-    //get the anchor
+    //get the anchor for this century 
     int anchor;
     anchor = thisCenturysAnchorDay(year);
-    printf("Anchor day for this century: %d\n", anchor);
     
     //using the "odd+11" method, find this year's doomsday
     
     //get the last two digits of the year
     int t;
     t = year % 100;
-    printf("Last two digits: %d\n", t);
     
     //if t is odd, add 11
     if (t % 2 != 0) {
@@ -135,27 +134,9 @@ int thisYearsDoomsday(int year) {
 }
 
 char * dayOfWeekString(int day) {
-    char *dayStr = "";
+    char *days[] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
     
-    if (day == 0) {
-        dayStr = "Sunday";
-    } else if (day == 1) {
-        dayStr = "Monday";
-    } else if (day == 2) {
-        dayStr = "Tuesday";
-    } else if (day == 3) {
-        dayStr = "Wednesday";
-    } else if (day == 4) {
-        dayStr = "Thursday";
-    } else if (day == 5) {
-        dayStr = "Friday";
-    } else if (day == 6) {
-        dayStr = "Saturday";
-    } else {
-        dayStr = "ERROR";
-    }
-    
-    return dayStr;
+    return days[abs(day)];
 }
 
 char * monthNameString(int month) {
@@ -209,11 +190,9 @@ int distanceFromNearestDoomsday (int day, int month) {
         distance = day - 12;
     }
     
-    //now we know how many days a day is from the month's doomsday...
-    printf("This day is %d days from this month's doomsday\n", distance);
+    //take out all the multiples of 7 to get pos or neg offset to get distance from day of week doomsday
+    distance = distance % 7;
     
-    //take out all the multiples of 7 to get day of week number
-    int dayOfWeekNum = distance % 7;
-    
-    return dayOfWeekNum;
+    //give back this distance (-6 ... 6)
+    return distance;
 }
