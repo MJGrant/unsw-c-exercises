@@ -161,12 +161,7 @@ char * dayOfWeekString(int day) {
 char * monthNameString(int month) {
     char *months[] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
     
-    if (month >= 1 && month <= 12) {
-       return months[month - 1];
-    } else {
-        printf("Error: bad month %d passed in\n", month);
-    }
-    
+    return months[month - 1];
 }
 
 int distanceFromNearestDoomsday (int day, int month) {
