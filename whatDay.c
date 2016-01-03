@@ -110,7 +110,6 @@ bool isLeapYear(int year) {
         isLY = false;
     }
     
-    printf("Leap year status: %d\n", isLY);
     return isLY;
 }
 
@@ -154,7 +153,6 @@ int thisYearsDoomsday(int year) {
 }
 
 char * dayOfWeekString(int day) {
-    printf("day is coming in as %d\n", day);
     char *days[] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
     
     return days[day];
@@ -181,9 +179,8 @@ int dayOfWeek (int doomsday, int day, int month, int year) {
     }
     
     //add all the days in all the leading up to (but not including) the passed in month's number
-    for (int i = 0; i < month; i ++) {
+    for (int i = 0; i < month - 1; i ++) {
         julianDay = julianDay + months[i];
-        printf("julianDay is now: %d\n", julianDay);
     }
     
     //now add all the days leading up to (but not including) the passed in date's date
@@ -191,11 +188,10 @@ int dayOfWeek (int doomsday, int day, int month, int year) {
         julianDay ++;
     }
     
-    printf("julianDay is: %d\n", julianDay);
-    
     //example: if we passed in 12-25-2016, we should have a total of 335 + 25 = 360 days
     //subtract the first doomsday to get the distance, mod by 7 to get day of week
-    dayOfWeekNum = (doomsday + (julianDay - firstDoomsday)) % 7;
+    int distance = julianDay - firstDoomsday;
+    dayOfWeekNum = (doomsday + distance) % 7;
     
     //2016's doomsday is monday so (1 + (360 - 4)) % 7
     //(1 + (365)) % 7 = 0 (Christmas day is on a Sunday)
