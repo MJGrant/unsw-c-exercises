@@ -8,12 +8,14 @@ to run: ./whatDay
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 int thisYearsDoomsday(int year);
 int thisCenturysAnchorDay(int year);
 char * dayOfWeekString(int day);
 char * monthNameString(int month);
-int distanceFromNearestDoomsday(int day, int month);
+int dayOfWeek(int doomsday, int day, int month, int year);
+bool isLeapYear(int year);
 
 //ask user for the day, month, and year they want to check
 //example: 12/31/2015
@@ -61,8 +63,7 @@ int main (void) {
     
 
     //put it all together
-    int inputDateAsDayNum = doomsday + distanceFromNearestDoomsday(day, month);
-    char *dayName = dayOfWeekString(inputDateAsDayNum);
+    char *dayName = dayOfWeekString(dayOfWeek(doomsday, day, month, year));
     
     printf("%s %d, %d is a %s\n", monthNameString(month), day, year, dayName);
     return EXIT_SUCCESS;
@@ -94,11 +95,30 @@ int thisCenturysAnchorDay(int year) {
     return anchorDay;
 }
 
+bool isLeapYear(int year) {
+    bool isLY;
+    
+    //http://stackoverflow.com/questions/3220163/how-to-find-leap-year-programatically-in-c
+    
+    if (year % 4 != 0) {
+        isLY = false;
+    } else if (year % 100 != 0) {
+        isLY = true;
+    } else if (year % 400 == 0) {
+        isLY = true;
+    } else {
+        isLY = false;
+    }
+    
+    printf("Leap year status: %d\n", isLY);
+    return isLY;
+}
+
 //determine the "doomsday" (as a day number) for that specific year (we have to know what it is for a particular year first, then calculate from that)
 //it's Saturday (6) in the 12/32/2015 test case
 
 int thisYearsDoomsday(int year) {
-    //get the anchor for this century 
+    //get the anchor for this century
     int anchor;
     anchor = thisCenturysAnchorDay(year);
     
@@ -134,9 +154,10 @@ int thisYearsDoomsday(int year) {
 }
 
 char * dayOfWeekString(int day) {
+    printf("day is coming in as %d\n", day);
     char *days[] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
     
-    return days[abs(day)];
+    return days[day];
 }
 
 char * monthNameString(int month) {
@@ -145,54 +166,41 @@ char * monthNameString(int month) {
     return months[month - 1];
 }
 
-int distanceFromNearestDoomsday (int day, int month) {
-    /* 
-     1/3 or 1/4 depending on if it's a leap year
-     3/0 (or 2/29)
-     3/7
-     4/4
-     5/9
-     6/6
-     7/11
-     8/8
-     9/5
-     10/10
-     11/17
-     12/12
-     */
+int dayOfWeek (int doomsday, int day, int month, int year) {
     
-    int distance;
+    //get the distance from the year's first doomsday, which is either 1/4 or 1/3 depending on whether the year is a leap year or not
     
-    if (month == 1) {
-        //absolute value of day - 3 or 4 leap year variation
-        distance = day - 3;
-    } else if (month == 2) {
-        distance = day - 29;
-    } else if (month == 3) {
-        distance = day - 7;
-    } else if (month == 4) {
-        distance = day - 4;
-    } else if (month == 5) {
-        distance = day - 9;
-    } else if (month == 6) {
-        distance = day - 6;
-    } else if (month == 7) {
-        distance = day - 11;
-    } else if (month == 8) {
-        distance = day - 8;
-    } else if (month == 9) {
-        distance = day - 5;
-    } else if (month == 10) {
-        distance = day - 10;
-    } else if (month == 11) {
-        distance = day - 17;
-    } else if (month == 12) {
-        distance = day - 12;
+    int firstDoomsday = 3;
+    int months[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    int dayOfWeekNum;
+    int julianDay = 0; //a date's sequential number in a year (ie: 12/25/2016 is 360)
+    
+    if (isLeapYear(year)) {
+        months[1] = 29;
+        firstDoomsday = 4; //first doomsday is the fourth of the year in leap years
     }
     
-    //take out all the multiples of 7 to get pos or neg offset to get distance from day of week doomsday
-    distance = distance % 7;
+    //add all the days in all the leading up to (but not including) the passed in month's number
+    for (int i = 0; i < month; i ++) {
+        julianDay = julianDay + months[i];
+        printf("julianDay is now: %d\n", julianDay);
+    }
     
-    //give back this distance (-6 ... 6)
-    return distance;
+    //now add all the days leading up to (but not including) the passed in date's date
+    for (int i = 0; i < day; i++) {
+        julianDay ++;
+    }
+    
+    printf("julianDay is: %d\n", julianDay);
+    
+    //example: if we passed in 12-25-2016, we should have a total of 335 + 25 = 360 days
+    //subtract the first doomsday to get the distance, mod by 7 to get day of week
+    dayOfWeekNum = (doomsday + (julianDay - firstDoomsday)) % 7;
+    
+    //2016's doomsday is monday so (1 + (360 - 4)) % 7
+    //(1 + (365)) % 7 = 0 (Christmas day is on a Sunday)
+    //(1 + (1 - 4)) % 7 = 5 (New Year's day is on a Friday)
+
+    printf("We did it! This date is on %s\n", dayOfWeekString(dayOfWeekNum));
+    return dayOfWeekNum;
 }
