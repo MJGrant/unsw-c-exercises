@@ -95,6 +95,7 @@ int thisCenturysAnchorDay(int year) {
     return anchorDay;
 }
 
+//Determine if the given year is a leapyear
 bool isLeapYear(int year) {
     bool isLY;
     
@@ -113,11 +114,9 @@ bool isLeapYear(int year) {
     return isLY;
 }
 
-//determine the "doomsday" (as a day number) for that specific year (we have to know what it is for a particular year first, then calculate from that)
-//it's Saturday (6) in the 12/32/2015 test case
+//Determine the "doomsday" (as a day number between 0 and 6) for that specific year
 
 int thisYearsDoomsday(int year) {
-    //get the anchor for this century
     int anchor;
     anchor = thisCenturysAnchorDay(year);
     
@@ -149,54 +148,57 @@ int thisYearsDoomsday(int year) {
 
     //returns this year's doomsday as a number (0 = Sunday, 1 = Monday, etc)
     return doomsday;
-    
 }
 
+
+//Return day of week name
 char * dayOfWeekString(int day) {
     char *days[] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
     
     return days[day];
 }
 
+//Return month name
 char * monthNameString(int month) {
     char *months[] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
     
     return months[month - 1];
 }
 
-int dayOfWeek (int doomsday, int day, int month, int year) {
+//Return day of week for a specific date (0 = Sunday, 1 = Monday, etc)
+int dayOfWeek (int doomsdayDayOfWeek, int day, int month, int year) {
     
-    //get the distance from the year's first doomsday, which is either 1/4 or 1/3 depending on whether the year is a leap year or not
-    
-    int firstDoomsday = 3;
+    int doomsdayJulian = 3;
     int months[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     int dayOfWeekNum;
-    int julianDay = 0; //a date's sequential number in a year (ie: 12/25/2016 is 360)
+    int thisDateJulian = 0; //a date's sequential number in a year (ie: 12/25/2016 is 360)
     
+    //A year's first doomsday is the 3rd Julian day in ordinary years and the 4th fourth Julian day in a leap year
     if (isLeapYear(year)) {
         months[1] = 29;
-        firstDoomsday = 4; //first doomsday is the fourth of the year in leap years
+        doomsdayJulian = 4;
     }
     
-    //add all the days in all the leading up to (but not including) the passed in month's number
+    
+    //Add all the days in all the leading up to (but not including) the passed in month's number
     for (int i = 0; i < month - 1; i ++) {
-        julianDay = julianDay + months[i];
+        thisDateJulian = thisDateJulian + months[i];
     }
     
-    //now add all the days leading up to (but not including) the passed in date's date
+    //Now add all the days leading up to (but not including) the passed in date's date
     for (int i = 0; i < day; i++) {
-        julianDay ++;
+        thisDateJulian ++;
     }
     
-    //example: if we passed in 12-25-2016, we should have a total of 335 + 25 = 360 days
-    //subtract the first doomsday to get the distance, mod by 7 to get day of week
-    int distance = julianDay - firstDoomsday;
-    dayOfWeekNum = (doomsday + distance) % 7;
+    //Now we need the number of days between the year's first Julian day (3 or 4) and the given date's Julian day (which could be anywhere from 1 to 366)
+    int distance = 0;
+    distance = thisDateJulian - doomsdayJulian;
+    if (distance < 0) {
+        //in the case of days before the year's first 'doomsday', add a week to fix negative problem
+        distance = distance + 7;
+    }
     
-    //2016's doomsday is monday so (1 + (360 - 4)) % 7
-    //(1 + (365)) % 7 = 0 (Christmas day is on a Sunday)
-    //(1 + (1 - 4)) % 7 = 5 (New Year's day is on a Friday)
+    dayOfWeekNum = (doomsdayDayOfWeek + distance) % 7;
 
-    printf("We did it! This date is on %s\n", dayOfWeekString(dayOfWeekNum));
     return dayOfWeekNum;
 }
