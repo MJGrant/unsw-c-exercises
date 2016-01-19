@@ -9,18 +9,22 @@ to run: ./whatDay
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <assert.h>
 
 int thisYearsDoomsday(int year);
 int thisCenturysAnchorDay(int year);
 char * dayOfWeekString(int day);
 char * monthNameString(int month);
-int dayOfWeek(int doomsday, int day, int month, int year);
+int dayOfWeek(int day, int month, int year);
 bool isLeapYear(int year);
+void test(void);
 
 //ask user for the day, month, and year they want to check
 //example: 12/31/2015
 
 int main (void) {
+    
+    test();
     
     int day;
     int month;
@@ -63,7 +67,7 @@ int main (void) {
     
 
     //put it all together
-    char *dayName = dayOfWeekString(dayOfWeek(doomsday, day, month, year));
+    char *dayName = dayOfWeekString(dayOfWeek(day, month, year));
     
     printf("%s %d, %d is a %s\n", monthNameString(month), day, year, dayName);
     return EXIT_SUCCESS;
@@ -166,8 +170,9 @@ char * monthNameString(int month) {
 }
 
 //Return day of week for a specific date (0 = Sunday, 1 = Monday, etc)
-int dayOfWeek (int doomsdayDayOfWeek, int day, int month, int year) {
+int dayOfWeek (int day, int month, int year) {
     
+    int doomsdayDayOfWeek = thisYearsDoomsday(year);
     int doomsdayJulian = 3;
     int months[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     int dayOfWeekNum;
@@ -201,4 +206,43 @@ int dayOfWeek (int doomsdayDayOfWeek, int day, int month, int year) {
     dayOfWeekNum = (doomsdayDayOfWeek + distance) % 7;
 
     return dayOfWeekNum;
+}
+
+void test (void) {
+    assert (isLeapYear(2015) == false);
+    assert (isLeapYear(2016) == true);
+    assert (isLeapYear(2100) == false);
+    
+    assert (thisCenturysAnchorDay(1800) == 5);
+    assert (thisCenturysAnchorDay(1900) == 3);
+    assert (thisCenturysAnchorDay(1983) == 3);
+    assert (thisCenturysAnchorDay(2000) == 2);
+    assert (thisCenturysAnchorDay(2016) == 2);
+    
+    assert (thisYearsDoomsday(2010) == 0);
+    assert (thisYearsDoomsday(2011) == 1);
+    assert (thisYearsDoomsday(2012) == 3);
+    assert (thisYearsDoomsday(2013) == 4);
+    assert (thisYearsDoomsday(2014) == 5);
+    assert (thisYearsDoomsday(2015) == 6);
+    assert (thisYearsDoomsday(2016) == 1);
+    assert (thisYearsDoomsday(2017) == 2);
+    
+    assert (dayOfWeekString(0) == "Sunday");
+    assert (dayOfWeekString(6) == "Saturday");
+    
+    assert (monthNameString(1) == "January");
+    assert (monthNameString(12) == "December");
+    
+    //int dayOfWeek (int day, int month, int year) {
+    assert (dayOfWeek(31, 12, 2015) == 4);
+    assert (dayOfWeek(1, 1, 2016) == 5);
+    assert (dayOfWeek(5, 1, 2016) == 2);
+    assert (dayOfWeek(29, 2, 2016) == 1);
+    assert (dayOfWeek(31, 12, 2016) == 6);
+    
+    assert (dayOfWeek(1, 1, 2010) == 5);
+    assert (dayOfWeek(1, 3, 2010) == 1);
+    
+    printf("All tests pass!\n");
 }
